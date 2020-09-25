@@ -2,6 +2,12 @@ import Axios from 'axios';
 import { Alert } from 'react-native';
 import {put, call, takeLatest, all, select} from 'redux-saga/effects';
 
+const FETCH_SUCCESS_URL = 'https://5f6daab160cf97001641b1de.mockapi.io/fetchSuccess';
+const FETCH_FAIL_URL = 'https://5f6daab160cf97001641b1de.mockapi.io/fetchFail';
+const LOGIN_URL = 'https://5f6daab160cf97001641b1de.mockapi.io/login';
+const USERNAME = 'username';
+const PASSWORD = 'password';
+
 const ADD_DATA = 'ADD_DATA';
 const SET_TOKEN = 'SET_TOKE';
 const AUTH = 'AUTH';
@@ -53,8 +59,8 @@ export const rootReducer = (state = initialState, action) => {
 };
 
 const fetchApi = (token) =>{
-    if (token==='valid') return Axios.get('https://5f6daab160cf97001641b1de.mockapi.io/fetchSuccess');
-    return Axios.get('https://5f6daab160cf97001641b1de.mockapi.io/fetchFail');
+    if (token==='valid') return Axios.get(FETCH_SUCCESS_URL);
+    return Axios.get(FETCH_FAIL_URL);
 }
 
 function* fetchGenertaor() {
@@ -70,12 +76,9 @@ function* fetchGenertaor() {
   }
 }
 
-function* dataSaga() {
-  yield takeLatest(FETCH, fetchGenertaor);
-}
 
 const authApi = ({username, password}) =>
-  Axios.post('https://5f6daab160cf97001641b1de.mockapi.io/login', {
+  Axios.post(LOGIN_URL, {
     username,
     password,
   });
@@ -91,12 +94,10 @@ function* authGenerator({username, password}) {
   }
 }
 
-function* authSaga() {
-  yield takeLatest(AUTH, authGenerator, {username: 'ssss', password: 'pwd'});
-}
 
 export function* rootSaga() {
-  yield all([dataSaga(), authSaga()]);
+    yield takeLatest(AUTH, authGenerator, {username: USERNAME, password: PASSWORD});
+    yield takeLatest(FETCH, fetchGenertaor);
 }
 
 // const sagaMiddleWare = createSagaMiddleWare()
